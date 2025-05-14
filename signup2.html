@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SentiSoil</title>
+  <link rel="stylesheet" type="text/css" href="style2.css">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet">
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  
+</head>
+<body>
+    <div class="signup2-container">
+        <h1>Sign Up</h1>
+        <div class="name-group">
+            <div class="input-group">
+                <input type="text" placeholder="Farm Owner">
+            </div>
+            <div class="input-group">
+                <select id="user-position" name="user-position">
+                    <option value="" disabled selected hidden>User Position</option>
+                    <option value="owner">Owner</option>
+                    <option value="manager">Manager</option>
+                    <option value="farmer">Farmer</option>
+                    <option value="field-supervisor">Field Supervisor</option>
+                </select>
+            </div>
+        </div>
+        <div class="name1-group">
+            <div class="input-group">
+                <input type="text" placeholder="Organization Name (Optional)">
+            </div>
+            <div class="input-group">
+                <input type="text" placeholder="Farm Name">
+            </div>
+            <div class="input-group">
+                <input type="text" placeholder="Farm Address">
+            </div>
+        </div>
+        <div class="button-group">
+            <a href="signup.html"><button class="back-button">BACK</button></a>
+            <button class="submit-button" onclick="submitSignup()">SUBMIT</button>
+        </div>
+    </div>
+
+    <script>
+        async function submitSignup() {
+            const part1 = JSON.parse(localStorage.getItem('signupData'));
+
+            const farmOwner = document.querySelector('input[placeholder="Farm Owner"]').value;
+            const userPosition = document.querySelector('#user-position').value;
+            const orgName = document.querySelector('input[placeholder="Organization Name (Optional)"]').value;
+            const farmName = document.querySelector('input[placeholder="Farm Name"]').value;
+            const farmAddress = document.querySelector('input[placeholder="Farm Address"]').value;
+
+            // Data validation
+            if (!farmOwner || !userPosition || !farmName || !farmAddress) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+
+            const fullData = {
+                ...part1,
+                farmOwner,
+                userPosition,
+                orgName,
+                farmName,
+                farmAddress
+            };
+
+            const res = await fetch('http://localhost:3000/signup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(fullData)
+            });
+
+            const text = await res.text();
+            alert(text);
+            if (res.ok) {
+                window.location.href = "login.html";
+            }
+        }
+    </script>
+</body>
+</html>

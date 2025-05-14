@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentiSoil</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+</head>
+<body>
+
+  <script>
+
+    if (localStorage.getItem("loggedIn") !== "true") {
+  window.location.href = "welcomepage/login.html"; // Redirect to login if not logged in
+}
+
+    fetch('http://localhost:3000/check-session', {
+      credentials: 'include'
+    })
+    .then(res => {
+      if (!res.ok) throw new Error("Session invalid");
+      return res.json();
+    })
+    .then(data => {
+      if (!data.loggedIn) {
+        window.location.href = "welcomepage/login.html";
+      }
+    })
+    .catch(err => {
+      console.warn("Redirecting due to session check failure:", err);
+      window.location.href = "welcomepage/login.html";
+    });
+
+    let soilZinc = 0;
+    let avgNPKLevel = 0;
+    let avgMoisture = 0;
+    let avgTemperature = 0;
+
+    // Load from localStorage if available
+    const storedData = localStorage.getItem('soilChartData');
+    if (storedData) {
+      const chartData = JSON.parse(storedData);
+      soilZinc = chartData.zinc;
+      avgNPKLevel = chartData.npk;
+      avgMoisture = chartData.moisture;
+      avgTemperature = chartData.temperature;
+    }
+
+    Chart.register({
+    id: 'centerText',
+    beforeDraw(chart) {
+      const { width } = chart;
+      const { height } = chart;
+      const ctx = chart.ctx;
+
+      ctx.restore();
+      const fontSize = (height / 120).toFixed(2);
+      ctx.font = `${fontSize}em 'Fredoka', sans-serif`;
+      ctx.textBaseline = 'middle';
+
+      const text = 'Soil Data';
+      const textX = Math.round((width - ctx.measureText(text).width) / 2);
+      const textY = height / 2;
+
+      ctx.fillStyle = '#333';
+      ctx.fillText(text, textX, textY);
+      ctx.save();
+    }
+  });
+
+    let soilHealthChart;
+
+    function renderSoilHealthChart() {
+      const ctx = document.getElementById('soilHealthChart').getContext('2d');
+
+      soilHealthChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          datasets: [{
+            data: [
+              Math.floor(Math.random() * 100),  // Zinc
+              Math.floor(Math.random() * 100),  // NPK
+              Math.floor(Math.random() * 100),  // Moisture
+              Math.floor(Math.random() * 100)   // Temperature
+            ],
+            backgroundColor: ['#ffcc00', '#4caf50', '#05d4e7', '#ff5733'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '70%',
+          plugins: {
+            legend: { position: 'bottom' },
+            tooltip: {
+              callbacks: {
+                label: (tooltipItem) => {
+                  // Map index to legend color and value
+                  const labels = ['Zinc', 'NPK', 'Moisture', 'Temperature'];
+                  const value = tooltipItem.raw;
+                  const label = labels[tooltipItem.dataIndex];
+                  return `${label}: ${value}%`;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    window.onload = () => {
+      renderSoilHealthChart();
+
+      // Simulate new random values every 3 seconds
+      setInterval(() => {
+        soilHealthChart.data.datasets[0].data = [
+          Math.floor(Math.random() * 100),  // Zinc
+          Math.floor(Math.random() * 100),  // NPK
+          Math.floor(Math.random() * 100),  // Moisture
+          Math.floor(Math.random() * 100)   // Temperature
+        ];
+        soilHealthChart.update();
+      }, 3000);
+    };
+
+    document.addEventListener('DOMContentLoaded', function () {
+    const menu = document.querySelector(".menu");
+    const dropdown = document.getElementById("dropdownMenu");
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    // Dropdown toggle
+    menu.addEventListener("click", () => {
+      dropdown.style.display = dropdown.style.display === "flex" ? "none" : "flex";
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!menu.contains(e.target) && !dropdown.contains(e.target)) {
+        dropdown.style.display = "none";
+      }
+    });
+
+    // Logout button
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', async function (e) {
+        e.preventDefault();
+
+        try {
+          const res = await fetch('http://localhost:3000/logout', {
+            method: 'POST',
+            credentials: 'include'
+          });
+
+          const message = await res.text();
+          console.log(message);
+          window.location.href = 'welcomepage/login.html';
+        } catch (err) {
+          console.error('Logout failed:', err);
+          alert('Logout failed. Try again.');
+        }
+      });
+    }
+  });
+
+  document.addEventListener("DOMContentLoaded", () => {
+  fetch("http://localhost:3000/user-info", {
+    credentials: "include"
+  })
+  .then(res => {
+    if (!res.ok) throw new Error("Not logged in");
+    return res.json();
+  })
+  .then(user => {
+    console.log("User info received:", user);
+
+    document.getElementById('userNameSpot').innerText = user.username;
+
+  })
+  .catch(err => {
+    console.error("Failed to fetch user info:", err);
+  });
+});
+
+  </script>
+
+  <!-- Header Section -->
+  <div class="header-container">
+    <div class="System-title">
+      <a href="index.html">SentiSoil</a>
+    </div>
+    <div class="menu-container">
+    <div class="menu">
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+    <!-- Here. bag-o ni. Menu ni siya -->
+    <div class="dropdown-menu" id="dropdownMenu">
+      <a href="user.html">User Profile</a>
+      <a href="#">Settings</a>
+      <a href="#">Help & Support</a>
+      <a href="#">Feedback</a>
+      <a href="#" id="logoutBtn">Logout</a>
+    </div>
+  </div>
+</div>
+
+  <!-- Navigation Section -->
+  <div class="content-wrapper">
+    <div class="nav-container">
+      <a href="sensor.html" class="nav-link">Sensors</a>
+      <a href="#" class="nav-link">History</a>
+      <a href="#" class="nav-link">AI Insights</a>
+      <a href="farmdetails.html" class="nav-link">Farm Details</a>
+    </div>
+
+    <!-- Main Section -->
+    <div class="content">
+      <div class="text-column">
+        <div class="welcome-card">
+          <h2>WELCOME,<br><span id="userNameSpot">FARMER!</h2>
+        </div>
+        <div class="description-card">
+          <p>
+            Grow smarter, not harder — our IoT-powered soil system tracks your field’s health live and helps you make data-driven farming decisions.
+          </p>
+        </div>
+      </div>
+      <div class="image-column">
+        <img src="soil.png" alt="Farmer dashboard image" class="side-image">
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-section">
+    <div class="dashboard-container">
+      <div class="divider"></div>
+
+      <!-- soil monitoring system-->
+      <div class="overall-analysis">
+        <h3>SOIL MONITORING SYSTEM</h3>
+        <div class="donut-chart">
+            <canvas id="soilHealthChart"></canvas>
+        </div>
+        <div class="legend">
+            <div><span class="dot" style="background:#ffcc00;"></span> Zinc Level</div>
+            <div><span class="dot" style="background:#4caf50;"></span> Avg NPK Level</div>
+            <div><span class="dot" style="background:#05d4e7;"></span> Moisture</div>
+            <div><span class="dot" style="background:#ff5733;"></span> Temperature</div>
+        </div>
+        
+        <p>Overall Analysis of Soil Condition</p>
+    </div>
+
+      <!-- see sensors/history/urgent tasks/ -->
+      <div class="card-group">
+        <div class="card-row">
+          <a href="sensor.html" class="sensor-card">
+            <i class="fas fa-seedling sensor-icon"></i>
+            <div class="sensor-label">See Sensors</div>
+          </a>
+
+          <a href="history.html" class="sensor-card">
+            <i class="fas fa-history sensor-icon"></i>
+            <div class="sensor-label">See Previous Data</div>
+          </a>
+        </div>
+
+        <div class="dashboard-card urgent-card">
+          <div class="urgent-title">Urgent! <i class="fas fa-bullhorn"></i></div>
+          <div class="urgent-message">No Urgent Tasks<br>yet</div>
+        </div>
+      </div>
+
+      <!-- Features Section -->
+      <div class="divider1"></div>
+      <h2 class="features">FEATURES</h2>
+      <div class="divider2"></div>
+
+      <div class="Features-container">
+        <div class="Feature-group">
+          <div class="Feature1">
+            <h4>🌱 IoT Soil Monitoring</h4>
+            <p>Real-time tracking of moisture, temperature, zinc, and NPK levels with smart sensors for accurate soil insights.</p>
+          </div>
+          <div class="Feature2">
+            <h4>📊 Smart Data Analysis</h4>
+            <p>Unlock smarter farming through AI-driven analytics. The system compares current and historical data trends.</p>
+          </div>
+          <div class="Feature3">
+            <h4>🤖 AI Recommendations</h4>
+            <p>Get AI-powered suggestions to improve soil quality — from irrigation to fertilization — tailored to your farm’s needs.</p>
+          </div>
+          <div class="Feature4">
+            <h4>📱 Real-Time Alerts</h4>
+            <p>Instant notifications sent to farmers’ devices when critical thresholds are reached — ensuring timely action for optimal soil care.</p>
+          </div>
+        </div>
+      </div>
+      <footer class="footer">
+        <div class="footer-content">
+          <p><strong>SentiSoil</strong> © 2025 · Empowering Smart Farming Through Intelligent Soil Insights. v1.0.0</p>
+          <div class="footer-links">
+            <a href="#">Privacy</a> · 
+            <a href="#">Terms</a> · 
+            <a href="#">Contact</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </div>
+</body>
+</html>

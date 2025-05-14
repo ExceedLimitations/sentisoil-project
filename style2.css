@@ -1,0 +1,265 @@
+/* Design sa background sa login page and signup page */
+body {
+    margin: 0;
+    background-image: url('background2.webp');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-attachment: fixed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+/* White box na nagcontain sa mga sulod sa login page */
+.login-container {
+    background-color: white;
+    border-radius: 20px;
+    padding: 2rem;
+    width: 320px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Design sa "Hello, Farmer!" */
+h1 {
+    font-family: 'Fredoka', sans-serif;
+    color: #027361;
+    font-size: 48px;
+    margin: 0 0 1rem 0;
+    font-weight: bold;
+}
+
+/* icon below sa header (h1) */
+.icon {
+    font-size: 50px;
+    color: #027361;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* design sa container sa mga inputs */
+.input-group {
+    position: relative;
+    margin-bottom: 1rem;
+    justify-content: center;
+    color: #027361;
+    font-family: 'Fredoka', sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+/* design para sa dropdown na naa sa signup page */
+.input-group select {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2rem;
+    border-radius: 25px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    color: #027361;
+    font-family: 'Fredoka', sans-serif;
+    appearance: none;
+    background-color: white;
+}
+
+/* design gihapon sa dropdown, specifically when magpili si user */
+.input-group select:focus {
+    outline: none;
+    border-color: #ccc;
+}
+
+/* style sa input fields, ang icon, placeholder, etc. */
+.input-group input {
+    width: 100%;
+    max-width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2rem;
+    border-radius: 25px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    color: #027361;
+    font-family: 'Fredoka', sans-serif;
+}
+
+/* design sa placeholder */
+.input-group input::placeholder {
+    color: #027361; /* a softer version of your main green */
+    opacity: 1;     /* ensure it's not faded */
+}
+
+/* design sa icon na naa sa inputs */
+.input-icon {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: #10644e;
+}
+
+/* design sa remember me na text */
+.remember {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    color: #027361;
+    margin-bottom: 1rem;
+    justify-content: flex-start;
+    font-family: 'Fredoka', sans-serif;
+    padding-right: 6rem;
+}
+
+/* design sa checkbox sa remember me */
+.remember input {
+    margin-right: 0.5rem;
+    color: #027361;
+}
+
+/* design sa login button */
+.login-button {
+    background-color:#027361;
+    color: white;
+    font-family: 'Fredoka', sans-serif;
+    border-radius: 25px;
+    border: 1px solid;
+    padding: 0.75rem 2.5rem;
+}
+
+/* design sa login button pag ihover */
+.login-button:hover {
+    background-color: white;
+    color: #027361;
+}
+
+/* design sa forgot password */
+.link {
+    font-size: 14px;
+    color: #10644e;
+    font-family: 'Fredoka', sans-serif;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+/* design sa signup */
+.signup {
+    color: #10644e;
+    font-weight: bold;
+    font-family: 'Fredoka', sans-serif;
+    padding-top: 1rem;
+}
+
+/* design specifically sa link sa signup */
+.signup a {
+    color: #10644e;
+    font-weight: bold;
+    font-family: 'Fredoka', sans-serif;
+}
+
+/* SIGN UP PAGE */
+
+/* white box na nagcontain sa sulod sa signup page */
+.signup-container {
+    background-color: white;
+    border-radius: 20px;
+    padding: 2rem;
+    width: 400px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* design para masame row ang duha sa input */
+.name-group {
+    display: flex;
+    gap: 1rem; /* spacing between first and last name */
+    justify-content: space-between;
+}
+
+.name-group .input-group {
+    flex: 1;
+}
+
+/* design para masame length ang input sa combined length sa name-group */
+.name1-group {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+/* design sa next button sa signup page */
+.next-button {
+    background-color:#027361;
+    color: white;
+    font-family: 'Fredoka', sans-serif;
+    border-radius: 25px;
+    border: 1px solid;
+    padding: 0.75rem 2.5rem;
+}
+
+/* design sa next button pag ihover */
+.next-button:hover {
+    background-color: white;
+    color: #027361;
+}
+
+/* SIGN UP 2 PAGE */
+
+/* white box na nagcontain sa sulod sa signup page */
+.signup2-container {
+    background-color: white;
+    border-radius: 20px;
+    padding: 2rem;
+    width: 400px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* design para same row ang back og next button */
+.button-group {
+    display: flex;
+    gap: 1rem; /* spacing between first and last name */
+    justify-content: space-between;
+}
+
+/* design para sa back button sa signup page */
+.back-button {
+    background-color:#027361;
+    color: white;
+    font-family: 'Fredoka', sans-serif;
+    border-radius: 25px;
+    border: 1px solid;
+    padding: 0.75rem 2.5rem;
+}
+
+/* design sa back button pag ihover */
+.back-button:hover {
+    background-color: white;
+    color: #027361;
+}
+
+/* design sa submit button */
+.submit-button {
+    background-color:#027361;
+    color: white;
+    font-family: 'Fredoka', sans-serif;
+    border-radius: 25px;
+    border: 1px solid;
+    padding: 0.75rem 2.5rem;
+}
+
+/* design sa submit button pag ihover */
+.submit-button:hover {
+    background-color: white;
+    color: #027361;
+}

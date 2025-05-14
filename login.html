@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  
+  <title>SentiSoil</title>
+
+  <!-- Link to CSS -->
+  <link rel="stylesheet" type="text/css" href="style2.css">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Login Container -->
+  <div class="login-container">
+    <h1>Hello,<br>Farmer!</h1>
+
+    <div class="icon"> 
+      <img src="SentiSoil.png" alt="User Icon" style="width: 180px; height: 180px;">
+    </div>
+
+    <!-- Login Form -->
+    <form id="login-form">
+      <!-- Username Input -->
+      <div class="input-group">
+        <span class="input-icon">👤</span>
+        <input type="text" id="username" placeholder="Username" required>
+      </div>
+
+      <!-- Password Input -->
+      <div class="input-group">
+        <span class="input-icon">🔒</span>
+        <input type="password" id="password" placeholder="Password" required>
+      </div>
+
+      <!-- Remember Me -->
+      <div class="remember">
+        <input type="checkbox" id="remember">
+        <label for="remember">Remember me</label>
+      </div>
+
+      <!-- Login Button -->
+      <button type="submit" class="login-button">LOG IN</button>
+    </form>
+
+    <!-- Forgot Password and Signup Links -->
+    <a href="#" class="link">Forgot Password?</a>
+    <div class="signup">
+      Don’t have an account yet? <a href="signup.html">Sign Up</a>
+    </div>
+  </div>
+
+  <!-- JavaScript Logic -->
+  <script>
+
+      document.getElementById('login-form').addEventListener('submit', async function (e) {
+        e.preventDefault(); // Prevent page reload
+
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        console.log('Attempting login with:', username); // 🔍
+
+        try {
+          const res = await fetch('http://localhost:3000/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include', // needed for sessions
+            body: JSON.stringify({ username, password })
+          });
+
+          console.log('Login response status:', res.status); // 🔍
+          const text = await res.text();
+          console.log('Login response text:', text); // 🔍
+
+          if (res.ok) {
+            alert(text); // Login successful
+            localStorage.setItem("loggedIn", "true"); // Set a flag to indicate successful login
+            window.location.href = "../index.html"; // Redirect to the homepage
+          } else {
+            alert(text); // Show error message
+          }
+        } catch (error) {
+          console.error('Login error:', error);
+          alert('Something went wrong. Please try again.');
+        }
+      });
+
+      async function checkLoginStatus() {
+        // Skip session checking if the user just logged in (via the session flag)
+        if (sessionStorage.getItem("justLoggedIn") === "true") {
+          console.log("Skipping session check because the user just logged in.");
+          sessionStorage.removeItem("justLoggedIn"); // Remove the flag once the check is complete
+          return;
+        }
+
+        console.log("Checking session status...");
+
+        try {
+          const res = await fetch('http://localhost:3000/check-session', {
+            method: 'GET',
+            credentials: 'include' // Needed to send session cookies
+          });
+
+          const data = await res.json();
+          console.log('Session check response:', data); // 🔍
+
+          if (data.loggedIn) {
+            // If the user is logged in and is on the login page, redirect to the homepage
+            if (window.location.pathname.includes("login.html")) {
+              console.log("Redirecting to homepage because user is logged in.");
+              window.location.replace("../index.html"); // Redirect to home page
+            }
+          } else {
+            console.log("User is not logged in.");
+          }
+        } catch (error) {
+          console.error('Error checking session:', error);
+        }
+      }
+
+      // Call this function when the page loads to check if the user is already logged in
+      checkLoginStatus();
+
+
+  </script>
+</body>
+</html>

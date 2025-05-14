@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentiSoil</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+</head>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const menu = document.querySelector(".menu");
+    const dropdown = document.getElementById("dropdownMenu");
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    // Dropdown toggle
+    menu.addEventListener("click", () => {
+      dropdown.style.display = dropdown.style.display === "flex" ? "none" : "flex";
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!menu.contains(e.target) && !dropdown.contains(e.target)) {
+        dropdown.style.display = "none";
+      }
+    });
+
+    // Logout button
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', async function (e) {
+        e.preventDefault();
+
+        try {
+          const res = await fetch('http://localhost:3000/logout', {
+            method: 'POST',
+            credentials: 'include'
+          });
+
+          const message = await res.text();
+          console.log(message);
+          window.location.href = 'welcomepage/login.html';
+        } catch (err) {
+          console.error('Logout failed:', err);
+          alert('Logout failed. Try again.');
+        }
+      });
+    }
+  });
+
+  document.addEventListener("DOMContentLoaded", () => {
+  fetch("http://localhost:3000/user-info", {
+    credentials: "include"
+  })
+  .then(res => {
+    if (!res.ok) throw new Error("Not logged in");
+    return res.json();
+  })
+  .then(user => {
+    console.log("User info received:", user);
+
+    document.getElementById('userName').innerText = user.first_name + ' ' + user.last_name;
+    document.getElementById('userEmail').innerText = user.email;
+    document.getElementById('userPhone').innerText = user.contact;
+    document.getElementById('userPosition').innerText = user.user_position;
+
+  })
+  .catch(err => {
+    console.error("Failed to fetch user info:", err);
+  });
+});
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const editBtn = document.getElementById('editBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    const deleteBtn = document.getElementById('deleteAccountBtn');
+    if (deleteBtn) {
+      deleteBtn.addEventListener('click', async () => {
+        if (!confirm("Are you sure you want to delete your account? This cannot be undone.")) return;
+
+        try {
+          const res = await fetch('http://localhost:3000/delete-account', {
+            method: 'DELETE',
+            credentials: 'include'
+          });
+
+          if (!res.ok) throw new Error("Delete failed");
+
+          alert("Your account has been deleted.");
+          window.location.href = 'welcomepage/login.html';
+        } catch (err) {
+          console.error('Delete account failed:', err);
+          alert("Failed to delete account. Please try again.");
+        }
+      });
+    }
+
+    const emailDisplay = document.getElementById('userEmail');
+    const phoneDisplay = document.getElementById('userPhone');
+
+    // Create input fields dynamically and insert them after the existing elements
+    const emailInput = document.createElement('input');
+    emailInput.type = 'email';
+    emailInput.id = 'userEmailInput';
+    emailInput.style.display = 'none';
+    emailDisplay.parentNode.insertBefore(emailInput, emailDisplay.nextSibling);
+
+    const phoneInput = document.createElement('input');
+    phoneInput.type = 'text';
+    phoneInput.id = 'userPhoneInput';
+    phoneInput.style.display = 'none';
+    phoneDisplay.parentNode.insertBefore(phoneInput, phoneDisplay.nextSibling);
+
+    // Edit Button Click
+    editBtn.addEventListener('click', () => {
+      emailInput.value = emailDisplay.innerText;
+      phoneInput.value = phoneDisplay.innerText;
+
+      emailDisplay.style.display = 'none';
+      phoneDisplay.style.display = 'none';
+
+      emailInput.style.display = 'block';
+      phoneInput.style.display = 'block';
+
+      editBtn.style.display = 'none';
+      saveBtn.style.display = 'inline-block';
+    });
+
+    // Save Button Click
+    saveBtn.addEventListener('click', async () => {
+      const updatedEmail = emailInput.value.trim();
+      const updatedPhone = phoneInput.value.trim();
+
+      try {
+        const res = await fetch('http://localhost:3000/update-profile', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({
+            email: updatedEmail,
+            contact: updatedPhone
+          })
+        });
+
+        if (!res.ok) throw new Error("Update failed");
+
+        // Update display values
+        emailDisplay.innerText = updatedEmail;
+        phoneDisplay.innerText = updatedPhone;
+
+        // Toggle visibility back
+        emailDisplay.style.display = 'block';
+        phoneDisplay.style.display = 'block';
+        emailInput.style.display = 'none';
+        phoneInput.style.display = 'none';
+        editBtn.style.display = 'inline-block';
+        saveBtn.style.display = 'none';
+      } catch (err) {
+        console.error('Profile update failed:', err);
+        alert('Could not update profile. Please try again.');
+      }
+    });
+  });
+
+
+</script>
+
+<body>
+    <!-- Header Section -->
+    <div class="header-container">
+
+        <div class="System-title">
+            <a href="index.html">SentiSoil</a>
+        </div>
+        <div class="menu-container">
+          <div class="menu">
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+          <div class="dropdown-menu" id="dropdownMenu">
+            <a href="#">User Profile</a>
+            <a href="#">Settings</a>
+            <a href="#">Help & Support</a>
+            <a href="#">Feedback</a>
+            <a href="#" id="logoutBtn">Logout</a>
+          </div>
+        </div>
+    </div>
+
+    <!-- Navigation Section -->
+    <div class="content-wrapper">
+        <div class="nav-container">
+          <a href="sensor.html" class="nav-link">Sensors</a>
+          <a href="#" class="nav-link">History</a>
+          <a href="#" class="nav-link">AI Insights</a>
+          <a href="farmdetails.html" class="nav-link">Farm Details</a>
+        </div>
+
+    <!-- Main Section -->
+     <!-- User Info Section -->
+     <div class="user-info-container">
+      <div class="user-profile-card">
+        
+        <div class="profile-section">
+          <div class="profile-pic">
+            <i class="fas fa-user-circle"></i>
+          </div>
+          <div class="user-details">
+            <!--Farmer Name-->
+            <h2 id="userName">Name</h2>
+            <!--Farmer Position-->
+            <p id="userPosition">Position</p>
+          </div>
+        </div>
+    
+        <div class="edit-section">
+        <button id="editBtn" class="edit-btn button"><i class="fas fa-pen"></i> Edit Profile</button>
+        <button id="saveBtn" class="edit-btn button" style="display:none;"><i class="fas fa-save"></i> Save</button>
+        <i class="fas fa-cog settings-icon"></i>
+        </div>
+    
+      </div>
+    </div>    
+
+      <div class="info-box two-column">
+        <div class="info-left">
+          <div class="info-field">
+            <!--Email Address Used-->
+            <label>Email Address</label>
+            <p id="userEmail">example@email.com</p>
+            <input type="email" id="userEmailInput" style="display: none;" />
+          </div>
+          <div class="info-field">
+            <!--Phone Number Used-->
+            <label>Phone Number</label>
+            <p id="userPhone">+1234567890</p>
+            <input type="text" id="userPhoneInput" style="display: none;" />
+          </div>
+          <div class="info-field password-field">
+            <label>Password</label>
+            <p>
+              ******** 
+              <button class="security-btn button">
+                <i class="fas fa-lock"></i> Security Settings
+              </button>              
+            </p>
+          </div>
+          <div class="info-field danger-zone">
+            <label>Account Deletion</label>
+            <button id="deleteAccountBtn" class="delete-btn button">
+              <i class="fas fa-trash"></i> Delete Account
+            </button>
+          </div>          
+        </div>
+      
+        <div class="info-right notification-preferences-form">
+          <h3><i class="fas fa-bell"></i> Alert & Notification Preferences</h3>
+          <label><input type="checkbox" checked> Email</label><br>
+          <label><input type="checkbox" checked> SMS</label><br>
+          <label><input type="checkbox" checked> In-site Notifications</label>
+        </div>
+      </div>
+
+      <footer class="footer">
+        <div class="footer-content">
+          <p><strong>SentiSoil</strong> © 2025 · Empowering Smart Farming Through Intelligent Soil Insights. v1.0.0</p>
+          <div class="footer-links">
+            <a href="#">Privacy</a> · 
+            <a href="#">Terms</a> · 
+            <a href="#">Contact</a>
+          </div>
+        </div>
+      </footer>
+      
+    </div>
+    </body>

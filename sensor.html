@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentiSoil</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+    <div class="header-container">
+        <div class="System-title">
+            <a href="index.html">SentiSoil</a>
+        </div>
+        <div class="menu-container">
+        <div class="menu">
+            <div></div>
+            <div></div>
+            <div></div>
+           </div> <!-- Here. bag-o ni. Menu ni siya -->
+          <div class="dropdown-menu" id="dropdownMenu">
+            <a href="user.html">User Profile</a>
+            <a href="#">Settings</a>
+            <a href="#">Help & Support</a>
+            <a href="#">Feedback</a>
+            <a href="#" id="logoutBtn">Logout</a>
+          </div>
+        </div>
+    </div>
+
+    <div class="content-wrapper">
+        <div class="nav-container">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="#" class="nav-link">History</a>
+            <a href="#" class="nav-link">AI Insights</a>
+            <a href="farmdetails.html" class="nav-link">Farm Details</a>
+        </div>
+
+        <div class="dashboard-sensors">
+            <div class="dashboard-container">
+                <div class="Monitor-AI-group">
+                    <!-- soil monitoring system-->
+                    <div class="overall-analysis">
+                        <h3>SOIL MONITORING SYSTEM</h3>
+                        <div class="donut-chart">
+                            <canvas id="soilHealthChart"></canvas>
+                        </div>
+                        <div class="legend">
+                            <div><span class="dot" style="background:#ffcc00;"></span> Zinc Level</div>
+                            <div><span class="dot" style="background:#4caf50;"></span> Avg NPK Level</div>
+                            <div><span class="dot" style="background:#05d4e7;"></span> Moisture</div>
+                            <div><span class="dot" style="background:#ff5733;"></span> Temperature</div>
+                        </div>
+                        
+                        <p>Overall Analysis of Soil Condition</p>
+                    </div>
+
+                    <!-- AI Insights -->
+                    <div class="AI">
+                        <h3>AI SUGGESTS!</h3>
+                        <div class="AI-box">
+                        
+                        <!-- Ask AI prompt -->
+                        <p class="ask-ai-container">
+                            <a href="#" id="askAI" class="ask-ai-link" onclick="generateAISuggestions(); hideAskAI();">Ask AI the best course of action ➔</a>
+                            <span id="loadingSpinner" class="spinner" style="display: none;"></span>
+                        </p>
+                    
+                        <!-- Suggestions container -->
+                        <div id="ai-suggestions" style="display: none;"></div>
+                    
+                        </div>
+                    </div>
+                </div>
+
+                <div class="health-group">
+                    <div class="npk">
+                        <h3>NPK Level</h3>
+                        <canvas id="npkChart"></canvas> <!-- This will display the NPK chart -->       
+                    </div>
+
+                    <div class="zinc">
+                        <h3 class="zinc-title">Zinc Level</h3>
+                        <canvas id="zincChart" width="300" height="150"></canvas> <!-- This will display the Zinc chart -->
+                    </div>
+
+                    <div class="moisture">
+                        <h3>Moisture Level</h3>
+                        <canvas id="moistureChart"></canvas> <!-- This will display the Moisture chart -->
+                    </div>
+
+                    <div class="temp">
+                        <h3>Temperature Level</h3>
+                        <canvas id="tempChart"></canvas> <!-- This will display the Temperature chart -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button onclick="openInputModal()" class="open-input-btn">Enter Data</button>
+
+        <!-- Modal Container -->
+        <div id="inputModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeInputModal()">&times;</span>
+            <h3>Manual Data Input</h3>
+            <label>Zinc Level: <input type="number" id="inputZinc" min="0" max="100" value="0"></label><br>
+            <label>Avg NPK Level: <input type="number" id="inputNPK" min="0" max="100" value="0"></label><br>
+            <label>Moisture Level: <input type="number" id="inputMoisture" min="0" max="100" value="0"></label><br>
+            <label>Temperature: <input type="number" id="inputTemp" min="0" max="100" value="0"></label><br>
+
+            <button onclick="updateSoilChartFromInput()">Submit</button>
+        </div>
+        </div>
+
+        <footer class="footer">
+            <div class="footer-content">
+              <p><strong>SentiSoil</strong> © 2025 · Empowering Smart Farming Through Intelligent Soil Insights. v1.0.0</p>
+              <div class="footer-links">
+                <a href="#">Privacy</a> · 
+                <a href="#">Terms</a> · 
+                <a href="#">Contact</a>
+              </div>
+            </div>
+          </footer>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+            const menu = document.querySelector(".menu");
+            const dropdown = document.getElementById("dropdownMenu");
+            const logoutBtn = document.getElementById('logoutBtn');
+
+            // Dropdown toggle
+            menu.addEventListener("click", () => {
+            dropdown.style.display = dropdown.style.display === "flex" ? "none" : "flex";
+            });
+
+            document.addEventListener("click", (e) => {
+            if (!menu.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.style.display = "none";
+            }
+            });
+
+            // Logout button
+            if (logoutBtn) {
+            logoutBtn.addEventListener('click', async function (e) {
+                e.preventDefault();
+
+                try {
+                const res = await fetch('http://localhost:3000/logout', {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+
+                const message = await res.text();
+                console.log(message);
+                window.location.href = 'welcomepage/login.html';
+                } catch (err) {
+                console.error('Logout failed:', err);
+                alert('Logout failed. Try again.');
+                }
+            });
+            }
+        });
+
+
+            let soilHealthChart;
+
+            let moistureData = [60, 62, 64, 63, 65];
+            let tempData = [25, 26, 27, 26, 25];
+            let npkData = [40, 40, 40]; // Default NPK values
+            let soilZinc = 40;
+            let avgNPKLevel = (npkData[0] + npkData[1] + npkData[2]) / 3;
+            let avgMoisture = moistureData[moistureData.length - 1];
+            let avgTemperature = tempData[tempData.length - 1];
+
+            renderSoilHealthChart();
+
+            function hideAskAI() {
+            document.getElementById('askAI').style.display = 'none';
+            }
+            function getCurrentTimeLabel() {
+            const now = new Date();
+            return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
+
+            function openInputModal() {
+            document.getElementById("inputModal").style.display = "block";
+            }
+
+            function closeInputModal() {
+            document.getElementById("inputModal").style.display = "none";
+            }
+
+            function updateSoilChartFromInput() {
+            const zincValue = parseFloat(document.getElementById('inputZinc').value);
+            const npkValue = parseFloat(document.getElementById('inputNPK').value);
+            const moistureDataInput = parseFloat(document.getElementById('inputMoisture').value);
+            const tempDataInput = parseFloat(document.getElementById('inputTemp').value);
+
+            // Update zinc chart
+            soilZinc = zincValue;
+            zincChart.data.datasets[0].data = [zincValue, 100 - zincValue];
+            zincChart.update();
+
+            // Update NPK chart
+            npkData = [npkValue, npkValue, npkValue];
+            npkChart.data.datasets[0].data = npkData;
+            npkChart.update();
+
+            // Update moisture chart
+            moistureChart.data.datasets[0].data.push(moistureDataInput);
+            moistureChart.data.labels.push(`T${moistureChart.data.labels.length + 1}`);
+            if (moistureChart.data.datasets[0].data.length > 5) {
+                moistureChart.data.datasets[0].data.shift();
+                moistureChart.data.labels.shift();
+            }
+            moistureChart.update();
+            avgMoisture = moistureChart.data.datasets[0].data.slice(-1)[0];
+
+            // Update temp chart
+            tempChart.data.datasets[0].data.push(tempDataInput);
+            tempChart.data.labels.push(`T${tempChart.data.labels.length + 1}`);
+            if (tempChart.data.datasets[0].data.length > 5) {
+                tempChart.data.datasets[0].data.shift();
+                tempChart.data.labels.shift();
+            }
+            tempChart.update();
+            avgTemperature = tempChart.data.datasets[0].data.slice(-1)[0];
+
+            // Recalculate average NPK
+            avgNPKLevel = (npkData[0] + npkData[1] + npkData[2]) / 3;
+
+            updateSoilHealthChart(); // Update the doughnut chart
+            closeInputModal();
+        }
+
+        function generateAISuggestions() {
+        const soilData = {
+            zinc: soilZinc,
+            npk: avgNPKLevel,
+            moisture: avgMoisture,
+            temperature: avgTemperature
+        };
+
+        // UI Elements
+        const askAI = document.getElementById('askAI');
+        const spinner = document.getElementById('loadingSpinner');
+        const suggestionsList = document.getElementById('ai-suggestions');
+
+        // Hide Ask AI link and show spinner
+        askAI.style.display = 'none';
+        spinner.style.display = 'inline-block';
+
+        // Fetch AI suggestions
+        fetch('http://localhost:3000/ai-suggestions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(soilData)
+        })
+        .then(res => res.json())
+        .then(data => {
+            spinner.style.display = 'none';
+            suggestionsList.style.display = 'block';
+            suggestionsList.innerHTML = '';
+
+            data.suggestions.forEach(suggestion => {
+            const p = document.createElement('p');
+            p.textContent = suggestion;
+            suggestionsList.appendChild(p);
+        });
+        })
+        .catch(err => {
+            spinner.style.display = 'none';
+            console.error('Error fetching suggestions:', err);
+            const li = document.createElement('li');
+            li.textContent = 'Error fetching AI suggestions.';
+            suggestionsList.appendChild(li);
+            suggestionsList.style.display = 'block';
+        });
+    }
+
+        function renderSoilHealthChart() {
+        const ctx = document.getElementById('soilHealthChart').getContext('2d');
+
+        const centerTextPlugin = {
+        id: 'centerText',
+        beforeDraw(chart) {
+        const { width, height } = chart;
+        const ctx = chart.ctx;
+
+        ctx.restore();
+
+        const fontSize = (height / 120).toFixed(2);
+        ctx.font = `${fontSize}em 'Fredoka', sans-serif`;
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = '#333';
+
+        const text = 'Soil Data';
+        const textX = Math.round((width - ctx.measureText(text).width) / 2);
+        const textY = height / 2;
+
+        ctx.fillText(text, textX, textY);
+        ctx.save();
+        }
+    };
+
+        soilHealthChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: [],
+                datasets: [{
+                    data: [soilZinc, avgNPKLevel, avgMoisture, avgTemperature],
+                    backgroundColor: ['#ffcc00', '#4caf50', '#05d4e7', '#ff5733'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: {
+                        callbacks: {
+                            label: (tooltipItem) => {
+                            // Map index to legend color and value
+                            const labels = ['Zinc', 'NPK', 'Moisture', 'Temperature'];
+                            const value = tooltipItem.raw;
+                            const label = labels[tooltipItem.dataIndex];
+                            return `${label}: ${value}%`;
+                            }
+                            
+                        }
+                    }
+                }
+            },
+            plugins: [centerTextPlugin]
+        });
+    }
+                function updateSoilHealthChart() {
+                soilHealthChart.data.datasets[0].data = [soilZinc, avgNPKLevel, avgMoisture, avgTemperature];
+                soilHealthChart.update();
+            }
+
+            const chartData = {
+            zinc: soilZinc,
+            npk: avgNPKLevel,
+            moisture: avgMoisture,
+            temperature: avgTemperature
+        };
+
+        localStorage.setItem('soilChartData', JSON.stringify(chartData));
+
+            // NPK Level Chart
+            const npkCtx = document.getElementById('npkChart').getContext('2d');
+            const npkGradient = npkCtx.createLinearGradient(0, 0, 0, 400);
+            npkGradient.addColorStop(0, '#a0e7a0');
+            npkGradient.addColorStop(1, '#4caf50');
+
+            const npkChart = new Chart(npkCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Nitrogen', 'Phosphorus', 'Potassium'],
+                    datasets: [{
+                        label: 'NPK Levels',
+                        data: npkData,
+                        backgroundColor: [npkGradient, '#64b5f6', '#ffb74d'],
+                        borderRadius: 10,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                scales: {
+                    x: {
+                    ticks: {
+                        font: {
+                        family: 'Geologica', // or any loaded font
+                        size: 14,
+                        weight: 'bold'
+                        },
+                        color: '#333'
+                    }
+                    },
+                    y: {
+                    beginAtZero: true,
+                    ticks: {
+                        font: {
+                        family: 'Geologica',
+                        size: 14,
+                        weight: 'bold'
+                        },
+                        color: '#333'
+                    }
+                    }
+                },
+                plugins: {
+                    legend: {
+                    display: false,
+                    labels: {
+                        font: {
+                        family: 'Geologica',
+                        size: 14,
+                        weight: 'bold'
+                        },
+                        color: '#333'
+                    }
+                    }
+                }
+                }
+            });
+            setInterval(() => {
+            npkChart.data.datasets[0].data = [
+                Math.floor(Math.random() * 100),  // Nitrogen
+                Math.floor(Math.random() * 100),  // Phosphorus
+                Math.floor(Math.random() * 100)   // Potassium
+            ];
+            npkChart.update();
+        }, 3000);
+
+
+            // Zinc Chart with custom label plugin
+            const zincLabelPlugin = {
+                id: 'zincLabelPlugin',
+                beforeDraw(chart) {
+                    if (chart.canvas.id !== 'zincChart') return;
+
+                    const { width, height, ctx } = chart;
+                    ctx.restore();
+
+                    const fontSize = (width / 10).toFixed(0);
+                    ctx.font = `${fontSize}px Montserrat`;
+                    ctx.textBaseline = "middle";
+                    ctx.textAlign = "center";
+
+                    const zincLevel = chart.data.datasets[0].data[0];
+                    const text = `${zincLevel}%`;
+                    const centerX = width / 2;
+                    const centerY = height * 0.65;
+
+                    ctx.fillStyle = "#333";
+                    ctx.fillText(text, centerX, centerY);
+                    ctx.save();
+                }
+            };
+
+            const zincCtx = document.getElementById('zincChart').getContext('2d');
+            Chart.register(zincLabelPlugin);
+
+            const zincChart = new Chart(zincCtx, {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [soilZinc, 100 - soilZinc],
+                        backgroundColor: ['#ffcc00', '#e0e0e0'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    circumference: 180,
+                    rotation: 270,
+                    cutout: '75%',
+                    layout: { padding: 10 },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (tooltipItem) => `Zinc: ${tooltipItem.raw}%`
+                            }
+                        }
+                    }
+                }
+            });
+            setInterval(() => {
+            const zincValue = Math.floor(Math.random() * 100); // Random zinc value between 0 and 100
+            zincChart.data.datasets[0].data = [zincValue, 100 - zincValue];
+            zincChart.update();
+
+            updateSoilHealthChart(); // Update overall health chart after Zinc update
+        }, 3000);
+
+            // Moisture Level Chart
+            const moistureCtx = document.getElementById('moistureChart').getContext('2d');
+            const moistureGradient = moistureCtx.createLinearGradient(0, 0, 0, 200);
+            moistureGradient.addColorStop(0, 'rgba(5, 212, 231, 0.5)');
+            moistureGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+            const moistureChart = new Chart(moistureCtx, {
+                type: 'line',
+                data: {
+                    labels: ['1PM', '2PM', '3PM', '4PM', '5PM'],
+                    datasets: [{
+                        label: 'Moisture (%)',
+                        data: moistureData,
+                        fill: true,
+                        backgroundColor: moistureGradient,
+                        borderColor: '#05d4e7',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#05d4e7'
+                    }]
+                },
+                options: {
+                scales: {
+                    x: {
+                    ticks: {
+                        font: {
+                        family: 'Geologica', // or any loaded font
+                        size: 14,
+                        weight: 'bold'
+                        },
+                        color: '#333'
+                    }
+                    },
+                    y: {
+                    beginAtZero: true,
+                    ticks: {
+                        font: {
+                        family: 'Geologica',
+                        size: 14,
+                        weight: 'bold'
+                        },
+                        color: '#333'
+                    }
+                    }
+                },
+                plugins: {
+                    legend: {
+                    display: false,
+                    labels: {
+                        font: {
+                        family: 'Geologica',
+                        size: 14,
+                        weight: 'bold'
+                        },
+                        color: '#333'
+                    }
+                    }
+                }
+                }
+            });
+            setInterval(() => {
+            const newMoisture = 50 + Math.floor(Math.random() * 20); // random 50–70%
+            const nextLabel = getCurrentTimeLabel();
+
+            moistureChart.data.labels.push(nextLabel);
+            moistureChart.data.datasets[0].data.push(newMoisture);
+
+            if (moistureChart.data.labels.length > 5) {
+                moistureChart.data.labels.shift();
+                moistureChart.data.datasets[0].data.shift();
+            }
+
+            moistureChart.update();
+        }, 3000);
+
+
+            // Temperature Level Chart
+            const tempCtx = document.getElementById('tempChart').getContext('2d');
+            const tempGradient = tempCtx.createLinearGradient(0, 0, 0, 200);
+            tempGradient.addColorStop(0, 'rgba(255, 87, 51, 0.4)');
+            tempGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+            const tempChart = new Chart(tempCtx, {
+                type: 'line',
+                data: {
+                    labels: ['1PM', '2PM', '3PM', '4PM', '5PM'],
+                    datasets: [{
+                        label: 'Temperature (°C)',
+                        data: tempData,
+                        fill: true,
+                        backgroundColor: tempGradient,
+                        borderColor: '#ff5733',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#ff5733'
+                    }]
+                },
+                options: {
+                scales: {
+                    x: {
+                    ticks: {
+                        font: {
+                        family: 'Geologica',
+                        size: 14,
+                        weight: 'bold'
+                        },
+                        color: '#333'
+                    }
+                    },
+                    y: {
+                    beginAtZero: true,
+                    ticks: {
+                        font: {
+                        family: 'Geologica',
+                        size: 14,
+                        weight: 'bold'
+                        },
+                        color: '#333'
+                    }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false,
+                    labels: {
+                        font: {
+                        family: 'Geologica',
+                        size: 14,
+                        weight: 'bold'
+                        },
+                        color: '#333'
+                    }
+                    }
+                }
+                }
+            });
+            setInterval(() => {
+            const newTemp = 25 + Math.floor(Math.random() * 5); // random 25–30°C
+            const nextLabel = getCurrentTimeLabel();
+
+            tempChart.data.labels.push(nextLabel);
+            tempChart.data.datasets[0].data.push(newTemp);
+
+            if (tempChart.data.labels.length > 5) {
+                tempChart.data.labels.shift();
+                tempChart.data.datasets[0].data.shift();
+            }
+
+            tempChart.update();
+        }, 3000);
+
+        </script>
+</body>
+</html>

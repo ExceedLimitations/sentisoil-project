@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SentiSoil</title>
+  <link rel="stylesheet" type="text/css" href="style2.css">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet">
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <!-- White box sa signup page -->
+    <div class="signup-container">
+        <h1>Sign Up</h1>
+        <!-- The name-group for firstname and lastname kay para sa design na same row sila  -->
+        <div class="name-group">
+        <!-- Input for firstname -->
+        <div class="input-group">
+            <input type="text" placeholder="First Name">
+        </div>
+        <!-- Input for lastname -->
+        <div class="input-group">
+            <input type="text" placeholder="Last Name">
+        </div>
+        </div>
+        <!-- Same purpose for username and contact number -->
+        <div class="name-group">
+        <!-- Input for username -->
+        <div class="input-group">
+            <span class="input-icon">👤</span>
+            <input type="text" placeholder="Username">  
+        </div> 
+        <!-- Input for contact number -->
+        <div class="input-group">
+            <span class="input-icon">📞</span>
+            <input type="text" placeholder="Contact Number">
+        </div>
+        </div>
+        <!-- For designing para same length sila sa combined size sa first 4 inputs -->
+        <div class="name1-group">
+        <!-- Input for email address -->
+        <div class="input-group">
+            <span class="input-icon">✉️</span>
+            <input type="text" placeholder="Email Address">
+        </div>
+        <!-- Input for password -->
+        <div class="input-group">
+            <span class="input-icon">🔒</span>
+            <input type="password" placeholder="Password">
+        </div>
+        <!-- Input for confirm password -->
+        <div class="input-group">
+            <span class="input-icon">🔒</span>
+            <input type="password" placeholder="Confirm Password">
+        </div>
+        </div>
+        <!-- For designing purposes, iya hover, color, size, etc. -->
+        <div class="button-group">
+        <!-- Back button, mapadulong sa login page balik -->
+        <a href="login.html"><button class="back-button">BACK</button></a>
+        <!-- Next buton, mapadulong sa next page sa signup -->
+        <a href="signup2.html"><button class="next-button">NEXT</button></a>
+        </div>
+    </div>
+</body>
+<script>
+    document.querySelector('.next-button').addEventListener('click', () => {
+      const data = {
+        firstName: document.querySelector('input[placeholder="First Name"]').value,
+        lastName: document.querySelector('input[placeholder="Last Name"]').value,
+        username: document.querySelector('input[placeholder="Username"]').value,
+        contact: document.querySelector('input[placeholder="Contact Number"]').value,
+        email: document.querySelector('input[placeholder="Email Address"]').value,
+        password: document.querySelectorAll('input[placeholder="Password"]')[0].value,
+        confirmPassword: document.querySelector('input[placeholder="Confirm Password"]').value
+      };
+      localStorage.setItem('signupData', JSON.stringify(data));
+    });
+  </script>  
+</html>
